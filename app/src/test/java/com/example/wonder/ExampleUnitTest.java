@@ -1,4 +1,4 @@
-package com.example.wonderoftheworld;
+package com.example.wonder;
 
 import org.junit.Test;
 

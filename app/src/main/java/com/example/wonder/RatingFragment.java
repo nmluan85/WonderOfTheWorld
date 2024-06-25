@@ -1,7 +1,10 @@
-package com.example.wonderoftheworld;
+package com.example.wonder;
 
 import android.content.Context;
 import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,46 +13,82 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link RatingFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class RatingFragment extends Fragment {
 
-import com.example.wonderoftheworld.databinding.FragmentGalleryBinding;
-
-public class GalleryFragment extends Fragment {
     private static  final int YES = 0;
     private static final int NO = 1;
     private static final int NONE = 2;
     public int mRadioButtonChoice = NONE;
     private static final String CHOICE = "choice";
+
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
+
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+    OnFragmentInteractionListener mListener;
+
+    public RatingFragment() {
+        // Required empty public constructor
+    }
     interface OnFragmentInteractionListener {
         void onRadioButtonChoice(int choice);
     }
-    OnFragmentInteractionListener mListener;
-    private FragmentGalleryBinding binding;
-    public static GalleryFragment newInstance(int choice) {
-        GalleryFragment fragment = new GalleryFragment();
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment BlankFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static RatingFragment newInstance(String param1, String param2) {
+        RatingFragment fragment = new RatingFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
+    public static RatingFragment newInstance(int choice) {
+        RatingFragment fragment = new RatingFragment();
         Bundle args = new Bundle();
         args.putInt(CHOICE, choice);
         fragment.setArguments(args);
         return fragment;
     }
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-
-        /*GalleryViewModel galleryViewModel =
-                new ViewModelProvider(this).get(GalleryViewModel.class);*/
-
-        binding = FragmentGalleryBinding.inflate(inflater, container, false);
-        View rootView = binding.getRoot();
-
-        /*final View rootView = inflater.inflate(R.layout.fragment_gallery, container, false);*/
+    public static RatingFragment newInstance(){
+        return new RatingFragment();
+    }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        final View rootView = inflater.inflate(R.layout.fragment_rating, container, false);
         final RadioGroup radioGroup = rootView.findViewById(R.id.radio_group);
         final RatingBar ratingBar = rootView.findViewById(R.id.ratingBar);
         if (getArguments().containsKey(CHOICE)){
             mRadioButtonChoice = getArguments().getInt(CHOICE);
-                if (mRadioButtonChoice != NONE){
-                    radioGroup.check(radioGroup.getChildAt(mRadioButtonChoice).getId());
-                }
+            if (mRadioButtonChoice != NONE){
+                radioGroup.check(radioGroup.getChildAt(mRadioButtonChoice).getId());
+            }
         }
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -92,10 +131,5 @@ public class GalleryFragment extends Fragment {
         } else {
             throw new ClassCastException(context.toString() + getResources().getString(R.string.exception_message));
         }
-    }
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
     }
 }
