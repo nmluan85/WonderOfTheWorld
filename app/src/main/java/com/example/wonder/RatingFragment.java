@@ -24,6 +24,7 @@ public class RatingFragment extends Fragment {
     private static final int NO = 1;
     private static final int NONE = 2;
     public int mRadioButtonChoice = NONE;
+    public float mRating = 0;
     private static final String CHOICE = "choice";
 
     // TODO: Rename parameter arguments, choose names that match
@@ -40,7 +41,7 @@ public class RatingFragment extends Fragment {
         // Required empty public constructor
     }
     interface OnFragmentInteractionListener {
-        void onRadioButtonChoice(int choice);
+        void onRadioButtonChoice(int choice, float rating);
     }
     /**
      * Use this factory method to create a new instance of
@@ -59,10 +60,11 @@ public class RatingFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-    public static RatingFragment newInstance(int choice) {
+    public static RatingFragment newInstance(int choice, float rating) {
         RatingFragment fragment = new RatingFragment();
         Bundle args = new Bundle();
         args.putInt(CHOICE, choice);
+        args.putFloat("rating", rating);
         fragment.setArguments(args);
         return fragment;
     }
@@ -84,11 +86,16 @@ public class RatingFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_rating, container, false);
         final RadioGroup radioGroup = rootView.findViewById(R.id.radio_group);
         final RatingBar ratingBar = rootView.findViewById(R.id.ratingBar);
+
         if (getArguments().containsKey(CHOICE)){
             mRadioButtonChoice = getArguments().getInt(CHOICE);
             if (mRadioButtonChoice != NONE){
                 radioGroup.check(radioGroup.getChildAt(mRadioButtonChoice).getId());
             }
+        }
+        if(getArguments().containsKey("rating")){
+            mRating = getArguments().getFloat("rating");
+            if (mRating != 0)  ratingBar.setRating(mRating);
         }
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -100,16 +107,16 @@ public class RatingFragment extends Fragment {
                     case YES:
                         textView.setText(R.string.yes_message);
                         mRadioButtonChoice = YES;
-                        mListener.onRadioButtonChoice(YES);
+                        mListener.onRadioButtonChoice(YES, mRating);
                         break;
                     case NO:
                         textView.setText(R.string.no_message);
                         mRadioButtonChoice = NO;
-                        mListener.onRadioButtonChoice(NO);
+                        mListener.onRadioButtonChoice(NO, mRating);
                         break;
                     default:
                         mRadioButtonChoice = NONE;
-                        mListener.onRadioButtonChoice(NONE);
+                        mListener.onRadioButtonChoice(NONE, mRating);
                         break;
                 }
             }
@@ -118,6 +125,7 @@ public class RatingFragment extends Fragment {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 String myRating = (getString(R.string.my_rating) + String.valueOf(ratingBar.getRating()));
+                mRating = ratingBar.getRating();
                 Toast.makeText(getContext(), myRating, Toast.LENGTH_SHORT).show();
             }
         });

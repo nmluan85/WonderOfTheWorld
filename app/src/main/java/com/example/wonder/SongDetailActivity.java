@@ -15,23 +15,36 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.wonder.content.SongUtils;
 
+import java.util.ArrayList;
 
-public class SongDetailActivity extends AppCompatActivity implements RatingFragment.OnFragmentInteractionListener{
 
-    private Button mButton;
+public class SongDetailActivity extends AppCompatActivity implements RatingFragment.OnFragmentInteractionListener, CommentFragment.CommentFragmentListener{
+
+    private Button mButtonRating;
+    private Button mButtonComment;
     private boolean isFragmentDisplay = false;
     static final String STATE_FRAGMENT = "state_of_fragment";
-    private int mRadioButtonChoice = 2;
+    public int mRadioButtonChoice = 2;
+    public float mRating = 0;
+    public String contentComment = "";
+
+    public interface SongDetailAcitivityListener {
+        void onSongSelected(int mRadioButtonChoice, float mRating, String contentComment);
+    }
+    public void onSongSelected(int mRadioButtonChoice, float mRating, String contentComment) {
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_detail);
-        mButton = findViewById(R.id.button_rating);
+        mButtonRating = findViewById(R.id.button_rating);
+        mButtonComment = findViewById(R.id.button_comment);
 
         if (savedInstanceState != null){
             isFragmentDisplay = savedInstanceState.getBoolean(STATE_FRAGMENT);
             if (isFragmentDisplay){
-                mButton.setText(R.string.close);
+                mButtonRating.setText(R.string.close);
             }
         }
         if (savedInstanceState == null) {
@@ -42,13 +55,27 @@ public class SongDetailActivity extends AppCompatActivity implements RatingFragm
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.song_detail_container, fragment)
                     .commit();
-            mButton.setOnClickListener(new View.OnClickListener() {
+            mButtonRating.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view){
                     if (!isFragmentDisplay){
                         displayFragment();
                     }
                     else closeFragment();
+                }
+            });
+            mButtonComment.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    CommentFragment commentFragment = new CommentFragment();
+
+                    Bundle args = new Bundle();
+                    args.putString("comment", contentComment);
+
+                    commentFragment.setArguments(args);
+
+                    commentFragment.show(fragmentManager, "comment_dialog");
                 }
             });
         }
@@ -61,16 +88,16 @@ public class SongDetailActivity extends AppCompatActivity implements RatingFragm
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.remove(ratingFragment).commit();
         }
-        mButton.setText("Review");
+        mButtonRating.setText("Rating");
         isFragmentDisplay = false;
     }
 
     private void displayFragment() {
-        RatingFragment ratingFragment = RatingFragment.newInstance(mRadioButtonChoice);
+        RatingFragment ratingFragment = RatingFragment.newInstance(mRadioButtonChoice, mRating);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.rating_container, ratingFragment).addToBackStack(null).commit();
-        mButton.setText(R.string.close);
+        mButtonRating.setText(R.string.close);
         isFragmentDisplay = true;
     }
 
@@ -85,12 +112,19 @@ public class SongDetailActivity extends AppCompatActivity implements RatingFragm
     }
 
     @Override
-    public void onRadioButtonChoice(int choice) {
+    public void onRadioButtonChoice(int choice, float rating) {
         mRadioButtonChoice = choice;
-        Toast.makeText(this, "Choice is " + Integer.toString(choice), Toast.LENGTH_SHORT).show();
+        mRating = rating;
+       /* Toast.makeText(this, "Choice is " + Integer.toString(choice), Toast.LENGTH_SHORT).show();*//**/
     }
     public void onSaveInstanceState(Bundle saveInstanceState){
         saveInstanceState.putBoolean(STATE_FRAGMENT, isFragmentDisplay);
         super.onSaveInstanceState(saveInstanceState);
+    }
+
+    @Override
+    public void onCommentSubmited(String comment) {
+        contentComment = comment;
+    /*    Toast.makeText(this, "Comment received: " + comment, Toast.LENGTH_SHORT).show();*/
     }
 }
